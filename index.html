@@ -1,0 +1,1339 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Camping Weekend Plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;500&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<script>
+  /* Runs before the page paints: marks the document as scripted (so sections start
+     hidden ready to reveal, with no flash) and locks it until sign-in. */
+  document.documentElement.className += " js";
+  try {
+    if (window.sessionStorage.getItem("camp.signedin") !== "yes") {
+      document.documentElement.className += " locked";
+    }
+  } catch (e) {
+    document.documentElement.className += " locked";
+  }
+</script>
+<style>
+  :root {
+    --paper:      #ffffff;
+    --panel:      #f8f9fa;
+    --panel-2:    #eaecf0;
+    --ink:        #202122;
+    --ink-soft:   #54595d;
+    --ink-faint:  #72777d;
+    --rule:       #a2a9b1;
+    --rule-soft:  #c8ccd1;
+    --link:       #3366cc;
+    --link-visit: #795cb2;
+    --link-open:  #0b74c4;
+    --open-wash:  #e7f2fb;
+    --warn:       #fc3;
+    --note:       #36c;
+    --ok:         #14866d;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper:      #101418;
+      --panel:      #27292d;
+      --panel-2:    #202122;
+      --ink:        #f8f9fa;
+      --ink-soft:   #c8ccd1;
+      --ink-faint:  #a2a9b1;
+      --rule:       #54595d;
+      --rule-soft:  #404244;
+      --link:       #88a3e8;
+      --link-visit: #a799cc;
+      --link-open:  #58bdf0;
+      --open-wash:  #12283a;
+      --warn:       #ac6600;
+      --note:       #36c;
+      --ok:         #2cb491;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper:      #101418;
+    --panel:      #27292d;
+    --panel-2:    #202122;
+    --ink:        #f8f9fa;
+    --ink-soft:   #c8ccd1;
+    --ink-faint:  #a2a9b1;
+    --rule:       #54595d;
+    --rule-soft:  #404244;
+    --link:       #88a3e8;
+    --link-visit: #a799cc;
+    --link-open:  #58bdf0;
+    --open-wash:  #12283a;
+    --warn:       #ac6600;
+    --note:       #36c;
+    --ok:         #2cb491;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Source Sans 3", -apple-system, "Segoe UI", Arial, "Helvetica Neue", sans-serif;
+    font-size: 17px;
+    line-height: 1.7;
+    margin: 0;
+    padding: 0 16px;
+    -webkit-font-smoothing: antialiased;
+  }
+  .page { max-width: 940px; margin: 0 auto; }
+
+  /* Links: the underline slides in from the left on hover. */
+  a, .linkish {
+    color: var(--link);
+    text-decoration: none;
+    background-image: linear-gradient(currentColor, currentColor);
+    background-repeat: no-repeat;
+    background-position: 0 100%;
+    background-size: 0 1px;
+    padding-bottom: 1px;
+    transition: background-size .3s cubic-bezier(.22, .61, .36, 1);
+  }
+  a:hover, a:focus-visible, .linkish:hover, .linkish:focus-visible { background-size: 100% 1px; }
+  a:visited { color: var(--link-visit); }
+  .linkish { font: inherit; border: 0; background-color: transparent; cursor: pointer; padding: 0 0 1px; }
+  :focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+
+  h1, h2, h3 {
+    font-family: "Source Serif 4", "Linux Libertine", Georgia, "Times New Roman", serif;
+    font-weight: 400;
+    text-wrap: balance;
+    letter-spacing: -.006em;
+    margin: 0;
+  }
+  h1 {
+    font-size: 2.1em;
+    line-height: 1.2;
+    padding-bottom: .2em;
+    border-bottom: 1px solid var(--rule);
+    margin-top: 1.1em;
+  }
+  h2 {
+    font-size: 1.55em;
+    padding-bottom: .18em;
+    border-bottom: 1px solid var(--rule);
+    margin: 0 0 .6em;
+  }
+  h3 { font-size: 1.15em; font-weight: 600; margin: 1.5em 0 .4em; }
+  h3 .count {
+    font-family: "Source Sans 3", Arial, sans-serif;
+    font-size: .8em;
+    font-weight: 400;
+    color: var(--ink-faint);
+    font-variant-numeric: tabular-nums;
+  }
+  h3 .count.done { color: var(--ok); }
+  .siteSub { font-size: 1em; color: var(--ink-soft); font-style: italic; margin-top: .4em; }
+  p { margin: .6em 0; max-width: 66ch; }
+  .lead { color: var(--ink-soft); }
+
+  /* ── Sign-in gate ────────────────────────────────── */
+  .gate { display: none; }
+  .locked .page { display: none; }
+  .locked .gate:not([hidden]) {
+    display: grid;
+    place-items: center;
+    min-height: 100vh;
+    padding: 24px;
+  }
+  .gatebox {
+    width: 100%;
+    max-width: 21em;
+    border: 1px solid var(--rule);
+    background: var(--panel);
+    padding: 1.6em 1.7em 1.8em;
+  }
+  .gatebox h1 {
+    font-size: 1.5em;
+    margin: 0 0 .1em;
+    padding: 0;
+    border: 0;
+  }
+  .gatebox .sub { color: var(--ink-soft); font-style: italic; margin: 0 0 1.3em; font-size: .95em; }
+  .gatebox label { display: block; margin-bottom: .9em; font-size: .9em; color: var(--ink-soft); }
+  .gatebox input {
+    font: inherit;
+    font-size: 1rem;
+    display: block;
+    width: 100%;
+    margin-top: .25em;
+    padding: .45em .6em;
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    background: var(--paper);
+    color: var(--ink);
+  }
+  .gatebox input:focus { border-color: var(--link); }
+  .gatebox .btn { width: 100%; text-align: center; margin-top: .4em; }
+  .gateerr {
+    margin: .9em 0 0;
+    padding: .5em .7em;
+    border-left: 4px solid var(--link-open);
+    background: var(--open-wash);
+    font-size: .9em;
+  }
+  .gatenote { margin: 1.4em 0 0; font-size: .82em; color: var(--ink-faint); line-height: 1.5; }
+
+  /* ── Scroll behaviour ────────────────────────────── */
+  section[id] { scroll-margin-top: 24px; margin: 2em 0; }
+  .js .reveal { opacity: 0; transform: translateY(16px); }
+  .js .reveal.in {
+    opacity: 1;
+    transform: none;
+    transition: opacity .6s ease, transform .6s cubic-bezier(.22, .61, .36, 1);
+  }
+  .toplink { display: block; text-align: right; font-size: .88em; margin-top: 1.2em; }
+
+  .ambox {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: .9em;
+    align-items: center;
+    border: 1px solid var(--rule-soft);
+    border-left: 10px solid var(--warn);
+    background: var(--panel);
+    padding: .8em 1.1em;
+    margin: 1.3em 0;
+  }
+  .ambox.note { border-left-color: var(--note); }
+  .ambox .glyph { font-size: 1.4em; line-height: 1; color: var(--ink-soft); }
+  .ambox p { margin: .2em 0; max-width: none; }
+
+  /* ── Weather infobox ─────────────────────────────── */
+  .infobox {
+    float: right;
+    clear: right;
+    width: 21em;
+    max-width: 100%;
+    margin: .4em 0 1.4em 1.8em;
+    border: 1px solid var(--rule);
+    background: var(--panel);
+    font-size: .93em;
+    line-height: 1.5;
+    border-collapse: collapse;
+  }
+  .infobox caption {
+    font-family: "Source Serif 4", Georgia, serif;
+    font-size: 1.2em;
+    padding: .5em .6em .4em;
+    background: var(--panel-2);
+    border-bottom: 1px solid var(--rule);
+    text-align: center;
+  }
+  .infobox th, .infobox td { text-align: left; vertical-align: middle; padding: .45em .75em; border-top: 1px solid var(--rule-soft); }
+  .infobox th { width: 7.5em; font-weight: 600; color: var(--ink-soft); }
+  .infobox .subhead td {
+    background: var(--panel-2);
+    text-align: center;
+    font-weight: 600;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    font-size: .8em;
+    color: var(--ink-soft);
+    position: relative;
+  }
+  .unitbtn { position: absolute; right: .45em; top: 50%; transform: translateY(-50%); }
+  .unitbtn button {
+    font: inherit;
+    font-size: 1em;
+    letter-spacing: 0;
+    text-transform: none;
+    padding: 0 .45em;
+    border: 1px solid var(--rule-soft);
+    border-radius: 2px;
+    background: var(--paper);
+    color: var(--link);
+    cursor: pointer;
+  }
+  .unitbtn button:hover { border-color: var(--ink-faint); }
+  .nowcell { display: flex; align-items: baseline; gap: .45em; flex-wrap: wrap; }
+  .bigtemp {
+    font-family: "Source Code Pro", ui-monospace, Consolas, monospace;
+    font-size: 1.9em;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.1;
+  }
+  .wxfeels { color: var(--ink-faint); font-size: .9em; }
+  .infobox .wxfoot td { text-align: center; font-size: .86em; color: var(--ink-faint); background: var(--panel-2); }
+  .infobox .advice td { background: var(--open-wash); color: var(--ink); font-size: .93em; }
+  .wx-wait { color: var(--ink-faint); }
+  .wx-fail { color: var(--link-open); }
+  .wx-load { opacity: .5; transition: opacity .2s ease; }
+
+  /* ── Contents ────────────────────────────────────── */
+  .toc {
+    display: inline-block;
+    border: 1px solid var(--rule);
+    background: var(--panel);
+    padding: .7em 1.6em .9em .9em;
+    margin: 1.5em 0 .5em;
+  }
+  .toc h2 { font-size: 1.05em; font-weight: 600; border: 0; display: block; text-align: center; margin: 0 0 .35em; padding: 0; }
+  .toc ol { list-style: none; margin: 0; padding: 0; counter-reset: toc; }
+  .toc li { counter-increment: toc; margin: .2em 0; }
+  .toc li::before { content: counter(toc) "\00a0\00a0"; color: var(--ink); font-variant-numeric: tabular-nums; }
+
+  /* ── Map ─────────────────────────────────────────── */
+  .mapframe { border: 1px solid var(--rule); background: var(--panel); padding: 4px; margin: 1.1em 0; max-width: 700px; }
+  .mapframe .canvas {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    background: var(--panel-2);
+    overflow: hidden;
+  }
+  .mapframe iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block; }
+  .mapframe figcaption { font-size: .9em; color: var(--ink-soft); padding: .55em .35em .25em; }
+  .maptools { display: flex; flex-wrap: wrap; gap: .6em; margin: .9em 0 0; }
+  .btn {
+    font: inherit;
+    font-size: .95em;
+    padding: .45em 1em;
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    background: var(--panel);
+    color: var(--link);
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+  }
+  .btn:hover { background: var(--panel-2); border-color: var(--ink-faint); }
+  .btn.primary { background: var(--link); border-color: var(--link); color: #fff; }
+  :root[data-theme="dark"] .btn.primary { color: #101418; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .btn.primary { color: #101418; } }
+  .btn.primary:hover { filter: brightness(1.08); background: var(--link); }
+  .btn[aria-pressed="true"] { background: var(--panel-2); border-color: var(--ink-faint); font-weight: 600; }
+
+  /* ── Tables ──────────────────────────────────────── */
+  .tablewrap { overflow-x: auto; margin: 1em 0; }
+  table.wikitable { border-collapse: collapse; background: var(--paper); min-width: 100%; }
+  table.wikitable th, table.wikitable td { border: 1px solid var(--rule-soft); padding: .55em .85em; text-align: left; vertical-align: top; }
+  table.wikitable th { background: var(--panel-2); font-weight: 600; }
+  table.wikitable td.time {
+    font-family: "Source Code Pro", ui-monospace, Consolas, monospace;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    width: 6em;
+  }
+  table.wikitable td.what { font-weight: 600; }
+  table.wikitable tbody tr:hover { background: var(--panel); }
+
+  /* Two-day forecast: metrics down the side, days across the top. */
+  table.forecast th[scope="row"] { width: 12em; color: var(--ink-soft); font-weight: 400; background: var(--paper); }
+  table.forecast td { font-variant-numeric: tabular-nums; width: 38%; }
+  table.forecast thead th { text-align: center; }
+  table.forecast .headline td { font-weight: 600; }
+
+  /* ── Fact lists ──────────────────────────────────── */
+  ul.facts { list-style: none; padding: 0; margin: .8em 0; display: grid; gap: .35em; max-width: 66ch; }
+  ul.facts li { display: grid; grid-template-columns: 11em 1fr; gap: .8em; }
+  ul.facts b { font-weight: 600; color: var(--ink-soft); }
+  @media (max-width: 600px) { ul.facts li { grid-template-columns: 1fr; gap: 0; } }
+  ul.bullets { padding-left: 1.3em; max-width: 66ch; }
+  ul.bullets li { margin: .3em 0; }
+
+  /* ── Checklists ──────────────────────────────────── */
+  .toolbar { display: flex; flex-wrap: wrap; gap: .6em; align-items: center; margin: 1em 0 .4em; }
+  .toolbar .progress { margin-left: auto; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+  .track { height: 8px; background: var(--panel-2); border: 1px solid var(--rule-soft); margin: 0 0 1.4em; }
+  .fill { height: 100%; width: 0; background: var(--ok); transition: width .3s ease; }
+
+  .cols { display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); gap: 0 2.6em; align-items: start; }
+  ul.checklist { list-style: none; margin: .3em 0 .5em; padding: 0; }
+  ul.checklist li.item { display: grid; grid-template-columns: auto 1fr auto; gap: .7em; align-items: baseline; padding: .22em 0; }
+  ul.checklist input[type="checkbox"] { accent-color: var(--link); width: 17px; height: 17px; margin: 0; transform: translateY(2px); }
+  ul.checklist label { cursor: pointer; }
+  ul.checklist li.checked label { color: var(--ink-faint); text-decoration: line-through; }
+  ul.checklist li.checked .qty { text-decoration: none; }
+  .qty { color: var(--ink-faint); font-size: .92em; }
+  .kill { font: inherit; border: 0; background: none; color: var(--ink-faint); cursor: pointer; padding: 0 .3em; opacity: 0; line-height: 1; }
+  li.item:hover .kill, .kill:focus-visible { opacity: 1; }
+  .kill:hover { color: var(--link-open); }
+  .allclear { color: var(--ink-faint); font-style: italic; padding: .3em 0 .5em; }
+  form.adder { display: flex; gap: .5em; margin: .3em 0 1.4em; }
+  form.adder input {
+    font: inherit;
+    font-size: .95em;
+    flex: 1;
+    min-width: 0;
+    padding: .35em .6em;
+    border: 1px solid var(--rule);
+    background: var(--paper);
+    color: var(--ink);
+    border-radius: 2px;
+  }
+
+  /* ── Editable text ───────────────────────────────── */
+  .ed { border-bottom: 1px dashed var(--rule); padding: 0 2px; min-width: 3em; display: inline-block; cursor: text; }
+  .ed:hover { background: var(--panel-2); }
+  .ed.empty { background: var(--open-wash); border-bottom-style: dotted; border-bottom-color: var(--link-open); }
+  .ed:focus, .ed.empty:focus { background: var(--paper); border-bottom-color: transparent; }
+  .ed.empty::before { content: attr(data-placeholder); color: var(--link-open); }
+
+  /* ── Footer ──────────────────────────────────────── */
+  .sitefoot {
+    margin-top: 3.5em;
+    border-top: 3px double var(--rule);
+    padding: 1.8em 0 3em;
+  }
+  .footgrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 1.8em 2.4em;
+  }
+  .sitefoot h2 {
+    font-family: "Source Sans 3", Arial, sans-serif;
+    font-size: .78em;
+    font-weight: 600;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    border: 0;
+    padding: 0;
+    margin: 0 0 .6em;
+  }
+  .sitefoot dl { margin: 0; font-size: .95em; }
+  .sitefoot dl div { display: flex; justify-content: space-between; gap: 1em; padding: .18em 0; border-bottom: 1px solid var(--rule-soft); }
+  .sitefoot dt { color: var(--ink-soft); }
+  .sitefoot dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; }
+  .sitefoot ul { list-style: none; margin: 0; padding: 0; font-size: .95em; }
+  .sitefoot ul li { padding: .18em 0; }
+  .sitefoot .tel { font-family: "Source Code Pro", ui-monospace, monospace; font-weight: 500; }
+  .footbar {
+    margin-top: 2em;
+    padding-top: 1em;
+    border-top: 1px solid var(--rule-soft);
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5em 1.5em;
+    justify-content: space-between;
+    font-size: .86em;
+    color: var(--ink-faint);
+  }
+
+  @media (max-width: 720px) {
+    body { font-size: 16px; }
+    .infobox { float: none; margin: 1.2em 0; width: 100%; }
+    h1 { font-size: 1.75em; }
+    table.forecast th[scope="row"] { width: 9em; }
+  }
+  @media print {
+    body { background: #fff; color: #000; font-size: 11pt; }
+    .noprint, .kill, form.adder, .toplink { display: none !important; }
+    .js .reveal { opacity: 1 !important; transform: none !important; }
+    .infobox { float: right; background: #fff; }
+    h2 { break-after: avoid; }
+    li.item, tr, .mapframe { break-inside: avoid; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    * { transition: none !important; }
+    .js .reveal { opacity: 1; transform: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="gate" id="gate">
+  <form class="gatebox" id="signin">
+    <h1>Camping plan</h1>
+    <p class="sub">Yahchouch, 24–25 August</p>
+
+    <label for="user">Name
+      <input type="text" id="user" name="username" autocomplete="username" autocapitalize="off" spellcheck="false" required>
+    </label>
+    <label for="pass">Password
+      <input type="password" id="pass" name="password" autocomplete="current-password" required>
+    </label>
+
+    <button type="submit" class="btn primary">Sign in</button>
+
+    <p class="gateerr" id="gateerr" hidden role="alert">That name and password don't match. Try again.</p>
+    <p class="gatenote">This is a doorstep, not a lock — the page is a file on this computer, so anyone
+    who opens it in a text editor can read everything. Don't put anything private here.</p>
+  </form>
+</div>
+
+<div class="page" id="top">
+
+  <h1>Camping at The Cliff Camp</h1>
+  <div class="siteSub">Yahchouch, Lebanon · 24–25 August 2026 · one night</div>
+
+  <table class="infobox">
+    <caption>Right now at Yahchouch</caption>
+    <tbody>
+      <tr class="subhead"><td colspan="2">Current conditions <span class="unitbtn noprint"><button type="button" id="units" title="Switch units">°F</button></span></td></tr>
+      <tr>
+        <th scope="row">Temperature</th>
+        <td><span class="nowcell"><span class="bigtemp" id="wxTemp">—</span> <span class="wxfeels" id="wxFeels"></span></span></td>
+      </tr>
+      <tr><th scope="row">Sky</th><td><span id="wxNow" class="wx-wait">Loading…</span></td></tr>
+      <tr><th scope="row">Humidity</th><td><span id="wxHum">—</span></td></tr>
+      <tr><th scope="row">Wind</th><td><span id="wxWind">—</span></td></tr>
+      <tr><th scope="row">Gusts</th><td><span id="wxGust">—</span></td></tr>
+      <tr class="advice" id="wxAdviceRow" hidden><td colspan="2"><span id="wxAdvice"></span></td></tr>
+      <tr class="wxfoot"><td colspan="2"><span id="wxStamp">Live from Open-Meteo.</span> <button type="button" class="linkish noprint" id="wxRefresh">Refresh</button></td></tr>
+    </tbody>
+  </table>
+
+  <p class="lead">Everything for the trip on one page: where the camp is, what the weather will do, what we do each
+  day, the hike, and what to bring. Tick things off as you pack them — the page remembers.</p>
+
+  <nav class="toc" aria-label="Contents">
+    <h2>Contents</h2>
+    <ol>
+      <li><a href="#where">Where we're going</a></li>
+      <li><a href="#weather">Weather for the two days</a></li>
+      <li><a href="#plan">Plan of the two days</a></li>
+      <li><a href="#hiking">The hike</a></li>
+      <li><a href="#needs">What to bring</a></li>
+    </ol>
+  </nav>
+
+  <!-- ═══ 1. Where ═════════════════════════════════ -->
+  <section id="where" class="reveal">
+    <h2>Where we're going</h2>
+
+    <p><b>The Cliff Camp</b>, Yahchouch — in the Keserwan hills, about 42 km north of Beirut and roughly 670 m up,
+    on the edge of the Jabal Moussa Biosphere Reserve above the Nahr Ibrahim valley.</p>
+
+    <figure class="mapframe">
+      <div class="canvas">
+        <iframe id="map" title="Map of The Cliff Camp, Yahchouch" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+      </div>
+      <figcaption>The Cliff Camp, Yahchouch, Lebanon. Map data &copy; Google.</figcaption>
+    </figure>
+
+    <div class="maptools noprint">
+      <a class="btn primary" id="openApp" href="#" target="_blank" rel="noopener">Open in Google Maps</a>
+      <a class="btn" id="openDir" href="#" target="_blank" rel="noopener">Get directions</a>
+    </div>
+
+    <h3>What the camp gives us</h3>
+    <ul class="facts">
+      <li><b>Sleeping</b><span>Wooden tents, with mattresses and electricity</span></li>
+      <li><b>Washing</b><span>Showers and toilets on site</span></li>
+      <li><b>Also there</b><span>A pool, a BBQ and bonfire area</span></li>
+      <li><b>Things to do</b><span>Hiking, climbing, rappelling, archery, flying fox</span></li>
+      <li><b>Fires</b><span><span class="ed" data-key="fire" data-placeholder="ask whether the bonfire is on"></span></span></li>
+      <li><b>Still to confirm</b><span><span class="ed" data-key="confirm" data-placeholder="meals included? what time can we arrive?"></span></span></li>
+    </ul>
+
+    <div class="ambox note">
+      <span class="glyph" aria-hidden="true">⌖</span>
+      <p><b>Save the map before you leave.</b> In the Google Maps app: open the place, tap <i>⋯</i>, then
+      <i>Download offline map</i>. Signal in the hills is not something to count on.</p>
+    </div>
+    <a class="toplink noprint" href="#top">Back to top ↑</a>
+  </section>
+
+  <!-- ═══ 2. Weather ═══════════════════════════════ -->
+  <section id="weather" class="reveal">
+    <h2>Weather for the two days</h2>
+    <p>Live forecast for Yahchouch, updated each time you open the page. Use the <b>°F</b> button in the box above
+    to switch units — it changes this table too.</p>
+
+    <div class="tablewrap">
+      <table class="wikitable forecast">
+        <thead>
+          <tr>
+            <th scope="col">&nbsp;</th>
+            <th scope="col">Monday 24 Aug</th>
+            <th scope="col">Tuesday 25 Aug</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="headline"><th scope="row">Sky</th><td id="d1sky">—</td><td id="d2sky">—</td></tr>
+          <tr><th scope="row">Warmest</th><td id="d1hi">—</td><td id="d2hi">—</td></tr>
+          <tr><th scope="row">Coolest (night)</th><td id="d1lo">—</td><td id="d2lo">—</td></tr>
+          <tr><th scope="row">Feels like, at worst</th><td id="d1feels">—</td><td id="d2feels">—</td></tr>
+          <tr><th scope="row">Chance of rain</th><td id="d1pop">—</td><td id="d2pop">—</td></tr>
+          <tr><th scope="row">Rain expected</th><td id="d1mm">—</td><td id="d2mm">—</td></tr>
+          <tr><th scope="row">Humidity</th><td id="d1hum">—</td><td id="d2hum">—</td></tr>
+          <tr><th scope="row">Wind</th><td id="d1wind">—</td><td id="d2wind">—</td></tr>
+          <tr><th scope="row">Gusts up to</th><td id="d1gust">—</td><td id="d2gust">—</td></tr>
+          <tr><th scope="row">UV index</th><td id="d1uv">—</td><td id="d2uv">—</td></tr>
+          <tr><th scope="row">Sunrise</th><td id="d1rise">—</td><td id="d2rise">—</td></tr>
+          <tr><th scope="row">Sunset</th><td id="d1set">—</td><td id="d2set">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="lead" id="wxNote">Sunset matters most on the first day — aim to arrive well before it.</p>
+    <a class="toplink noprint" href="#top">Back to top ↑</a>
+  </section>
+
+  <!-- ═══ 3. Plan ══════════════════════════════════ -->
+  <section id="plan" class="reveal">
+    <h2>Plan of the two days</h2>
+    <p>Times are a rough shape, not a schedule — click any of them to change it. The one that matters is getting
+    there in daylight, so you're settling in rather than hunting for things with a torch.</p>
+
+    <h3>Monday 24 August — getting there</h3>
+    <div class="tablewrap">
+      <table class="wikitable">
+        <thead><tr><th scope="col">Time</th><th scope="col">What</th></tr></thead>
+        <tbody>
+          <tr><td class="time"><span class="ed" data-key="f1">11:00</span></td><td class="what">Pack the car</td></tr>
+          <tr><td class="time"><span class="ed" data-key="f2">11:30</span></td><td class="what">Leave, Join Debs</td></tr>
+          <tr><td class="time"><span class="ed" data-key="f3">14:30</span></td><td class="what">Arrive and settle in</td></tr>
+          <tr><td class="time"><span class="ed" data-key="f4">16:00</span></td><td class="what">Free-time</td></tr>
+          <tr><td class="time"><span class="ed" data-key="f5">18:30</span></td><td class="what">Get the wood, prepare the BBQ</td></tr>
+          <tr><td class="time"><span class="ed" data-key="f6">19:30</span></td><td class="what">Bonfire and Dinner</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Tuesday 25 August — the hike, then home</h3>
+    <div class="tablewrap">
+      <table class="wikitable">
+        <thead><tr><th scope="col">Time</th><th scope="col">What</th></tr></thead>
+        <tbody>
+          <tr><td class="time"><span class="ed" data-key="u1">09:00</span></td><td class="what">Breakfast, and packing</td></tr>
+          <tr><td class="time"><span class="ed" data-key="u2">11:00</span></td><td class="what">Walk to the Chouwan entrance, pay, start Trail 13</td></tr>
+          <tr><td class="time"><span class="ed" data-key="u3">13:00</span></td><td class="what">Trail 12 down to Chouwan lake</td></tr>
+          <tr><td class="time"><span class="ed" data-key="u4">15:00</span></td><td class="what">Returning by going through Track 12</td></tr>
+          <tr><td class="time"><span class="ed" data-key="u5">16:30</span></td><td class="what">Leave</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <a class="toplink noprint" href="#top">Back to top ↑</a>
+  </section>
+
+  <!-- ═══ 4. Hiking ════════════════════════════════ -->
+  <section id="hiking" class="reveal">
+    <h2>The hike</h2>
+
+    <p>Two marked trails in the <b>Jabal Moussa Biosphere Reserve</b> — a UNESCO site — both starting from the
+    <b>Chouwan entrance</b>, on our side of the valley. Walked one after the other they come to <b>4.6 km</b> and
+    a little under three hours on the move, before stops.</p>
+
+    <div class="tablewrap">
+      <table class="wikitable forecast">
+        <thead>
+          <tr>
+            <th scope="col">&nbsp;</th>
+            <th scope="col">Trail 13 · Arbutus</th>
+            <th scope="col">Trail 12 · Lake</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="headline"><th scope="row">Difficulty</th><td>Difficult</td><td>Moderate</td></tr>
+          <tr><th scope="row">Distance</th><td>2.8 km</td><td>1.8 km</td></tr>
+          <tr><th scope="row">Time on the move</th><td>2 hours</td><td>50 minutes</td></tr>
+          <tr><th scope="row">Route</th><td>Chouwan entrance up to 400 m above the lake</td><td>Loop from the Chouwan entrance</td></tr>
+          <tr><th scope="row">What you'll see</th><td>Humid bushy forest, the Adonis river canyon below, endemic plants</td><td>Tall pine shade, then the slopes down to Chouwan lake in the Adonis Valley</td></tr>
+          <tr><th scope="row">Worth knowing</th><td>The harder of the two — take it first, while it's cool and you're fresh</td><td>The easy downhill on the way out is uphill on the way back</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>What it costs</h3>
+    <ul class="facts">
+      <li><b>Entry, weekdays</b><span>$4 per adult, $2 under 16 — and Monday and Tuesday are weekdays</span></li>
+      <li><b>Entry, weekends</b><span>$8 and $4, so we're on the cheaper days</span></li>
+      <li><b>Guide (optional)</b><span>$40–$60 depending on the trail's difficulty</span></li>
+      <li><b>Take cash</b><span>Don't count on paying by card at the entrance</span></li>
+      <li><b>Opening hours</b><span><span class="ed" data-key="hikehours" data-placeholder="confirm with the reserve or the camp"></span></span></li>
+    </ul>
+
+    <div class="ambox">
+      <span class="glyph" aria-hidden="true">☀</span>
+      <p><b>Start early.</b> Trail 13 is rated difficult and climbs 400 m above the lake, and August sun here
+      pushes the UV index to 8. Being on the canyon section before the heat builds is the difference between a
+      good morning and a grim one.</p>
+    </div>
+
+    <h3>Before you set off</h3>
+    <ul class="bullets">
+      <li><b>Shoes with grip.</b> Forest paths and a steep climb — not sandals.</li>
+      <li><b>Two litres of water each.</b> There's nowhere to buy any once you're on the trail.</li>
+      <li><b>Stay on the marked trails.</b> It's a protected reserve, and the canyon edge is unforgiving.</li>
+      <li><b>Tell someone at the camp</b> which trails you're doing and when you expect to be back.</li>
+      <li><b>Turn back if it has rained.</b> The canyon path and wet rock are a bad combination.</li>
+    </ul>
+
+    <div class="maptools noprint">
+      <a class="btn primary" id="trailMap" href="#" target="_blank" rel="noopener">Chouwan entrance on the map</a>
+      <a class="btn" href="https://www.jabalmoussa.org/trails-facilities" target="_blank" rel="noopener">All 15 trails and facilities</a>
+    </div>
+    <a class="toplink noprint" href="#top">Back to top ↑</a>
+  </section>
+
+  <!-- ═══ 5. Needs ═════════════════════════════════ -->
+  <section id="needs" class="reveal">
+    <h2>What to bring</h2>
+    <p>The camp provides the tent, the mattress and the showers, so this list is shorter than a normal camping one.
+    Tick each thing as it actually goes in the bag. You can add your own items, or remove any you don't need by
+    hovering over it and pressing <b>×</b>.</p>
+
+    <div class="toolbar noprint">
+      <button class="btn" id="filter" type="button" aria-pressed="false">Hide what's packed</button>
+      <button class="btn" id="reset" type="button">Clear all ticks</button>
+      <span class="progress" id="progress">0 of 0</span>
+    </div>
+    <div class="track"><div class="fill" id="fill"></div></div>
+
+    <div class="cols" id="groups"></div>
+    <a class="toplink noprint" href="#top">Back to top ↑</a>
+  </section>
+
+  <!-- ═══ Footer ═══════════════════════════════════ -->
+  <footer class="sitefoot">
+    <div class="footgrid">
+
+      <section>
+        <h2>The trip</h2>
+        <dl>
+          <div><dt>Camp</dt><dd>The Cliff Camp</dd></div>
+          <div><dt>Where</dt><dd>Yahchouch, Keserwan</dd></div>
+          <div><dt>Dates</dt><dd>24–25 Aug 2026</dd></div>
+          <div><dt>Nights</dt><dd>1</dd></div>
+          <div><dt>Altitude</dt><dd>≈ 670 m</dd></div>
+          <div><dt>From Beirut</dt><dd>≈ 42 km</dd></div>
+        </dl>
+      </section>
+
+      <section>
+        <h2>Emergency — Lebanon</h2>
+        <dl>
+          <div><dt>Red Cross</dt><dd><a class="tel" href="tel:140">140</a></dd></div>
+          <div><dt>Civil Defence</dt><dd><a class="tel" href="tel:125">125</a></dd></div>
+          <div><dt>Police</dt><dd><a class="tel" href="tel:112">112</a></dd></div>
+          <div><dt>Fire</dt><dd><a class="tel" href="tel:175">175</a></dd></div>
+          <div><dt>The camp</dt><dd><a class="tel" href="tel:+96170281118">70 281 118</a></dd></div>
+        </dl>
+      </section>
+
+      <section>
+        <h2>Getting there</h2>
+        <ul>
+          <li><a id="footMap" href="#" target="_blank" rel="noopener">The camp on Google Maps</a></li>
+          <li><a id="footDir" href="#" target="_blank" rel="noopener">Driving directions</a></li>
+          <li><a id="footTrail" href="#" target="_blank" rel="noopener">Chouwan trail entrance</a></li>
+          <li><a href="https://www.jabalmoussa.org/trails-facilities" target="_blank" rel="noopener">Jabal Moussa trails</a></li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>This page</h2>
+        <ul>
+          <li><a href="#weather">Weather</a></li>
+          <li><a href="#plan">The plan</a></li>
+          <li><a href="#hiking">The hike</a></li>
+          <li><a href="#needs">Packing list</a></li>
+          <li><button type="button" class="linkish noprint" id="signout">Sign out</button></li>
+        </ul>
+      </section>
+
+    </div>
+
+    <div class="footbar">
+      <span>Weather by <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a> ·
+        Maps by Google · Trail data from
+        <a href="https://www.jabalmoussa.org/trails-facilities" target="_blank" rel="noopener">Jabal Moussa</a></span>
+      <span id="saved">Your ticks and notes are saved in this browser only.</span>
+    </div>
+  </footer>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ── Sign in ─────────────────────────────────────────
+     Client-side only: the credentials sit in this file, so this keeps the page
+     tidy for whoever opens it — it is not security. */
+  var USER = "ray";
+  var PASS = "1234";
+
+  var gate = document.getElementById("gate");
+  var signinForm = document.getElementById("signin");
+  var userField = document.getElementById("user");
+  var passField = document.getElementById("pass");
+  var gateErr = document.getElementById("gateerr");
+
+  var afterUnlock = null;   // the reveal observer hooks in here once it exists
+
+  function unlock() {
+    document.documentElement.className = document.documentElement.className.replace(/\blocked\b/, "").trim();
+    gate.hidden = true;
+    try { window.sessionStorage.setItem("camp.signedin", "yes"); } catch (e) { /* nothing to do */ }
+    if (afterUnlock) afterUnlock();
+  }
+
+  if (document.documentElement.className.indexOf("locked") === -1) {
+    gate.hidden = true;
+  } else {
+    userField.focus();
+  }
+
+  signinForm.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var ok = userField.value.trim().toLowerCase() === USER && passField.value === PASS;
+    if (ok) {
+      gateErr.hidden = true;
+      unlock();
+      return;
+    }
+    gateErr.hidden = false;
+    passField.value = "";
+    passField.focus();
+  });
+
+  var KEY = "camp.v6";
+
+  /* Fixed destination. Coordinates are Yahchouch village (34°3'59"N, 35°44'11"E) —
+     hardcoded so the weather never depends on a place-name lookup. */
+  var SITE = { query: "The Cliff Camp, Yahchouch, Lebanon", lat: 34.0664, lon: 35.7364 };
+  var TRAIL = "Jabal Moussa Chouwan Entrance, Lebanon";
+  var TRIP_DAYS = ["2026-08-24", "2026-08-25"];
+
+  var DEFAULTS = [
+    { id: "grill", name: "Barbecue and fire", items: [
+      ["Meat for the grill", "Marinate it at home"],
+      ["Charcoal", ""],
+      ["Lighter", ""],
+      ["Saw", "For cutting firewood"],
+      ["Skewers", ""],
+      ["Tongs", ""],
+      ["Potatoes", "Wrap them in foil"],
+      ["Corn", ""],
+      ["Aluminium foil", ""],
+      ["Disposable gloves", ""],
+      ["Msaba3", "Check what this one is"]
+    ]},
+    { id: "food", name: "Food", items: [
+      ["Bread", ""],
+      ["Eggs", ""],
+      ["Butter", ""],
+      ["Picon cheese", ""],
+      ["Nutella", ""],
+      ["Chips", "Agree the flavours first"],
+      ["Chewing gum", ""],
+      ["Salt", ""],
+      ["Ketchup", ""],
+      ["Garlic sauce", ""],
+      ["Snacks for the drive", ""]
+    ]},
+    { id: "drink", name: "Drink", items: [
+      ["Water", "Beyond what we carry on the hike"],
+      ["Ice", ""],
+      ["Drinks", "Agree what and how much first"],
+      ["Instant coffee", ""],
+      ["Kettle for hot water", ""],
+      ["Teapot", ""],
+      ["Cups", ""]
+    ]},
+    { id: "kitchen", name: "Kitchen kit", items: [
+      ["Plates", ""],
+      ["Knives, forks and spoons", ""],
+      ["Frying pan", "For the eggs"],
+      ["Tissues", ""],
+      ["Bin bags", "We take our rubbish home"]
+    ]},
+    { id: "hike", name: "For the hike", items: [
+      ["Shoes with proper grip", "Forest paths and a 400 m climb — not sandals"],
+      ["Two litres of water each", "Nowhere to buy any on the trail"],
+      ["Cash for the entrance", "$4 each, and it's cash only"],
+      ["Small backpack", ""],
+      ["Sun hat", "UV reaches 8 here in August"],
+      ["Snacks", "Something salty"]
+    ]},
+    { id: "sleep", name: "Sleeping", items: [
+      ["Sleeping bag or blanket", "Mattress is provided, bedding may not be"],
+      ["Pillow", ""],
+      ["A layer for the evening", "670 m up, so cooler than the coast"],
+      ["Something dry to sleep in", ""],
+      ["Earplugs", "If you're a light sleeper"]
+    ]},
+    { id: "clothes", name: "Clothes", items: [
+      ["Swimsuit", "There's a pool at the camp"],
+      ["Second outfit", ""],
+      ["Underwear", ""],
+      ["Towel", ""],
+      ["Sandals", "For around camp and the showers"],
+      ["Light jacket or hoodie", "Evenings get cooler"]
+    ]},
+    { id: "wash", name: "Washing and personal", items: [
+      ["Toothbrush", ""],
+      ["Toothpaste", ""],
+      ["Soap", ""],
+      ["Deodorant", ""],
+      ["Cotton buds", ""],
+      ["Sunscreen", "High factor"],
+      ["Insect repellent", ""],
+      ["Any medication you take", ""],
+      ["Small first aid kit", "Plasters, painkillers, blister patches"],
+      ["Toilet roll", "Bring some, just in case"]
+    ]},
+    { id: "fun", name: "Things to do", items: [
+      ["Two seasons of Better Call Saul", "Downloaded, not streamed"],
+      ["Speaker", ""],
+      ["Backgammon", ""],
+      ["Guess What card game", ""],
+      ["Earphones", ""]
+    ]},
+    { id: "kit", name: "Documents and power", items: [
+      ["ID card", ""],
+      ["Phone charger", "The tents have electricity"],
+      ["Power bank", "In case the socket is taken"],
+      ["Head torch or a good flashlight", "One each"],
+      ["Swiss army knife", ""],
+      ["Cash", "For activities, the guide and extras"]
+    ]}
+  ];
+
+  /* ── Storage ─────────────────────────────────────── */
+  var state = { checked: {}, custom: {}, removed: {}, fields: {}, units: "c" };
+  var savedNote = document.getElementById("saved");
+
+  try {
+    var raw = window.localStorage.getItem(KEY);
+    if (raw) {
+      var parsed = JSON.parse(raw);
+      ["checked", "custom", "removed", "fields"].forEach(function (k) {
+        if (parsed && parsed[k] && typeof parsed[k] === "object") state[k] = parsed[k];
+      });
+      if (parsed && (parsed.units === "c" || parsed.units === "f")) state.units = parsed.units;
+    }
+  } catch (e) { /* some browsers block storage for local files */ }
+
+  function save() {
+    try {
+      window.localStorage.setItem(KEY, JSON.stringify(state));
+      savedNote.textContent = "Saved at " + new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+        + " — in this browser only.";
+    } catch (e) {
+      savedNote.textContent = "Not saving — this browser blocks storage for local files.";
+    }
+  }
+
+  /* ── Reveal sections as they scroll into view ────── */
+  var panels = Array.prototype.slice.call(document.querySelectorAll(".reveal"));
+  if (window.IntersectionObserver) {
+    var seer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add("in");
+        seer.unobserve(entry.target);
+      });
+    }, { rootMargin: "0px 0px -12% 0px", threshold: 0.06 });
+    panels.forEach(function (p) { seer.observe(p); });
+
+    /* While the gate is up the page is display:none, so nothing can intersect.
+       Re-observe once it's dismissed so the sections on screen reveal themselves. */
+    afterUnlock = function () {
+      panels.forEach(function (p) {
+        if (p.classList.contains("in")) return;
+        seer.unobserve(p);
+        seer.observe(p);
+      });
+    };
+  } else {
+    panels.forEach(function (p) { p.classList.add("in"); });
+  }
+
+  /* ── Map links ───────────────────────────────────── */
+  var enc = encodeURIComponent(SITE.query);
+  var trailEnc = encodeURIComponent(TRAIL);
+  var mapsUrl  = "https://www.google.com/maps/search/?api=1&query=" + enc;
+  var dirUrl   = "https://www.google.com/maps/dir/?api=1&destination=" + enc;
+  var trailUrl = "https://www.google.com/maps/search/?api=1&query=" + trailEnc;
+
+  document.getElementById("map").src = "https://maps.google.com/maps?q=" + enc + "&z=13&hl=en&output=embed";
+  document.getElementById("openApp").href = mapsUrl;
+  document.getElementById("openDir").href = dirUrl;
+  document.getElementById("trailMap").href = trailUrl;
+  document.getElementById("footMap").href = mapsUrl;
+  document.getElementById("footDir").href = dirUrl;
+  document.getElementById("footTrail").href = trailUrl;
+
+  /* ── Live weather (Open-Meteo — free, no API key) ── */
+  var CODES = {
+    0: "Clear", 1: "Mostly clear", 2: "Partly cloudy", 3: "Cloudy",
+    45: "Fog", 48: "Freezing fog",
+    51: "Light drizzle", 53: "Drizzle", 55: "Heavy drizzle",
+    56: "Freezing drizzle", 57: "Freezing drizzle",
+    61: "Light rain", 63: "Rain", 65: "Heavy rain",
+    66: "Freezing rain", 67: "Freezing rain",
+    71: "Light snow", 73: "Snow", 75: "Heavy snow", 77: "Snow grains",
+    80: "Light showers", 81: "Showers", 82: "Heavy showers",
+    85: "Snow showers", 86: "Heavy snow showers",
+    95: "Thunderstorm", 96: "Thunderstorm with hail", 99: "Thunderstorm with hail"
+  };
+  var COMPASS = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE",
+                 "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"];
+
+  function id(name) { return document.getElementById(name); }
+
+  var wxTemp = id("wxTemp"), wxFeels = id("wxFeels"), wxNow = id("wxNow");
+  var wxHum = id("wxHum"), wxWind = id("wxWind"), wxGust = id("wxGust");
+  var wxAdvice = id("wxAdvice"), adviceRow = id("wxAdviceRow"), wxStamp = id("wxStamp");
+  var wxNote = id("wxNote");
+  var unitsBtn = id("units"), refreshEl = id("wxRefresh");
+  var infobox = document.querySelector(".infobox");
+  var latest = null;   // last good reading, kept so switching units needs no refetch
+
+  var DAY_CELLS = ["sky", "hi", "lo", "feels", "pop", "mm", "hum", "wind", "gust", "uv", "rise", "set"];
+
+  function num(v) { return typeof v === "number" && isFinite(v); }
+  function describe(code) {
+    return Object.prototype.hasOwnProperty.call(CODES, code) ? CODES[code] : "—";
+  }
+  function temp(c) {
+    if (!num(c)) return "—";
+    return state.units === "f" ? Math.round(c * 9 / 5 + 32) + " °F" : Math.round(c) + " °C";
+  }
+  function speed(kmh) {
+    if (!num(kmh)) return "—";
+    return state.units === "f" ? Math.round(kmh * 0.621371) + " mph" : Math.round(kmh) + " km/h";
+  }
+  function bearing(deg) {
+    if (!num(deg)) return "";
+    return COMPASS[Math.round(deg / 22.5) % 16];
+  }
+  function uvWord(v) {
+    if (!num(v)) return "—";
+    var word = v < 3 ? "low" : v < 6 ? "moderate" : v < 8 ? "high" : v < 11 ? "very high" : "extreme";
+    return Math.round(v) + " — " + word;
+  }
+  function clockOf(stamp) {
+    return typeof stamp === "string" && stamp.length >= 16 ? stamp.slice(11, 16) : "—";
+  }
+  function blankDays() {
+    [1, 2].forEach(function (n) {
+      DAY_CELLS.forEach(function (cell) {
+        var el = id("d" + n + cell);
+        if (el) el.textContent = "—";
+      });
+    });
+  }
+
+  function paintWeather() {
+    if (!latest) return;
+    var cur = latest.current || {};
+    var day = latest.daily || {};
+
+    wxTemp.textContent = temp(cur.temperature_2m);
+    wxFeels.textContent = num(cur.apparent_temperature) ? "feels like " + temp(cur.apparent_temperature) : "";
+    wxNow.textContent = describe(cur.weather_code);
+    wxNow.className = "";
+    wxHum.textContent = num(cur.relative_humidity_2m) ? Math.round(cur.relative_humidity_2m) + "%" : "—";
+    wxWind.textContent = speed(cur.wind_speed_10m);
+    wxGust.textContent = speed(cur.wind_gusts_10m);
+
+    var times = day.time || [];
+    var lows = [], wet = false, uvMax = null, sunsetDay1 = null;
+
+    TRIP_DAYS.forEach(function (date, n) {
+      var slot = "d" + (n + 1);
+      var i = times.indexOf(date);
+
+      if (i === -1) {
+        DAY_CELLS.forEach(function (cell) { id(slot + cell).textContent = "too far ahead"; });
+        return;
+      }
+
+      var code = day.weather_code[i];
+      var lo   = day.temperature_2m_min[i];
+      var pop  = day.precipitation_probability_max[i];
+      var mm   = day.precipitation_sum[i];
+      var uv   = day.uv_index_max[i];
+
+      if (num(lo)) lows.push(lo);
+      if (code >= 51 || (num(pop) && pop >= 40)) wet = true;
+      if (num(uv) && (uvMax === null || uv > uvMax)) uvMax = uv;
+      if (n === 0) sunsetDay1 = clockOf(day.sunset[i]);
+
+      id(slot + "sky").textContent   = describe(code);
+      id(slot + "hi").textContent    = temp(day.temperature_2m_max[i]);
+      id(slot + "lo").textContent    = temp(lo);
+      id(slot + "feels").textContent = temp(day.apparent_temperature_max[i]);
+      id(slot + "pop").textContent   = num(pop) ? pop + "%" : "—";
+      id(slot + "mm").textContent    = num(mm) ? (mm === 0 ? "none" : mm.toFixed(1) + " mm") : "—";
+      id(slot + "hum").textContent   = num(day.relative_humidity_2m_mean[i])
+        ? Math.round(day.relative_humidity_2m_mean[i]) + "%" : "—";
+      id(slot + "wind").textContent  = speed(day.wind_speed_10m_max[i])
+        + (bearing(day.wind_direction_10m_dominant[i]) ? " from the " + bearing(day.wind_direction_10m_dominant[i]) : "");
+      id(slot + "gust").textContent  = speed(day.wind_gusts_10m_max[i]);
+      id(slot + "uv").textContent    = uvWord(uv);
+      id(slot + "rise").textContent  = clockOf(day.sunrise[i]);
+      id(slot + "set").textContent   = clockOf(day.sunset[i]);
+    });
+
+    var coldest = lows.length ? Math.min.apply(null, lows) : null;
+    var says = [];
+    if (wet) says.push("Rain is forecast — bring a jacket, and rethink the hike.");
+    if (num(uvMax) && uvMax >= 8) says.push("UV is very high — sunscreen and a hat.");
+    if (coldest !== null && coldest < 16) says.push("Cold after dark — pack a warm layer.");
+    if (coldest !== null && coldest >= 22) says.push("Warm night — a light blanket is enough.");
+    adviceRow.hidden = says.length === 0;
+    wxAdvice.textContent = says.join(" ");
+
+    if (sunsetDay1 && sunsetDay1 !== "—") {
+      wxNote.textContent = "The sun sets at " + sunsetDay1 + " on the Monday — aim to be at the camp"
+        + " and unpacked well before then.";
+    }
+
+    wxStamp.textContent = "Updated " + new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) + ".";
+  }
+
+  function loadWeather() {
+    infobox.classList.add("wx-load");
+    wxNow.textContent = "Loading…";
+    wxNow.className = "wx-wait";
+
+    fetch("https://api.open-meteo.com/v1/forecast"
+        + "?latitude=" + SITE.lat + "&longitude=" + SITE.lon
+        + "&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,"
+        + "wind_speed_10m,wind_gusts_10m"
+        + "&daily=weather_code,temperature_2m_max,temperature_2m_min,apparent_temperature_max,"
+        + "relative_humidity_2m_mean,precipitation_probability_max,precipitation_sum,"
+        + "wind_speed_10m_max,wind_gusts_10m_max,wind_direction_10m_dominant,uv_index_max,sunrise,sunset"
+        + "&forecast_days=16&timezone=auto")
+      .then(function (r) {
+        if (!r.ok) throw new Error("bad response");
+        return r.json();
+      })
+      .then(function (data) {
+        latest = data;
+        paintWeather();
+      })
+      .catch(function () {
+        latest = null;
+        wxTemp.textContent = "—";
+        wxFeels.textContent = "";
+        wxHum.textContent = "—";
+        wxWind.textContent = "—";
+        wxGust.textContent = "—";
+        adviceRow.hidden = true;
+        blankDays();
+        wxNow.textContent = "No connection — try Refresh";
+        wxNow.className = "wx-fail";
+        wxStamp.textContent = "Live from Open-Meteo.";
+      })
+      .then(function () {
+        infobox.classList.remove("wx-load");
+      });
+  }
+
+  unitsBtn.textContent = state.units === "f" ? "°C" : "°F";
+  unitsBtn.addEventListener("click", function () {
+    state.units = state.units === "f" ? "c" : "f";
+    unitsBtn.textContent = state.units === "f" ? "°C" : "°F";
+    paintWeather();
+    save();
+  });
+  refreshEl.addEventListener("click", loadWeather);
+  loadWeather();
+
+  /* ── What to bring ───────────────────────────────── */
+  var groupsEl = id("groups");
+  var hidePacked = false;
+
+  function itemsFor(group) {
+    var removed = state.removed[group.id] || [];
+    var out = [];
+    group.items.forEach(function (pair, i) {
+      var itemId = group.id + "." + i;
+      if (removed.indexOf(itemId) === -1) out.push({ id: itemId, text: pair[0], note: pair[1] });
+    });
+    (state.custom[group.id] || []).forEach(function (entry) {
+      out.push({ id: entry.id, text: entry.text, note: "", custom: true });
+    });
+    return out;
+  }
+
+  function render() {
+    groupsEl.textContent = "";
+
+    DEFAULTS.forEach(function (group) {
+      var all = itemsFor(group);
+      var done = all.filter(function (it) { return state.checked[it.id]; }).length;
+      var shown = hidePacked ? all.filter(function (it) { return !state.checked[it.id]; }) : all;
+
+      var box = document.createElement("section");
+
+      var h3 = document.createElement("h3");
+      h3.appendChild(document.createTextNode(group.name + " "));
+      var count = document.createElement("span");
+      count.className = "count" + (all.length && done === all.length ? " done" : "");
+      count.textContent = done + " of " + all.length;
+      h3.appendChild(count);
+      box.appendChild(h3);
+
+      var list = document.createElement("ul");
+      list.className = "checklist";
+
+      if (!shown.length) {
+        var empty = document.createElement("li");
+        empty.className = "allclear";
+        empty.textContent = all.length ? "All packed." : "Nothing in this list.";
+        list.appendChild(empty);
+      }
+
+      shown.forEach(function (it) {
+        var li = document.createElement("li");
+        li.className = "item" + (state.checked[it.id] ? " checked" : "");
+
+        var chk = document.createElement("input");
+        chk.type = "checkbox";
+        chk.id = "chk-" + it.id;
+        chk.checked = !!state.checked[it.id];
+        chk.addEventListener("change", function () {
+          if (chk.checked) state.checked[it.id] = true;
+          else delete state.checked[it.id];
+          save();
+          render();
+          refreshTotals();
+        });
+
+        var label = document.createElement("label");
+        label.htmlFor = chk.id;
+        label.appendChild(document.createTextNode(it.text));
+        if (it.note) {
+          var qty = document.createElement("span");
+          qty.className = "qty";
+          qty.textContent = " — " + it.note;
+          label.appendChild(qty);
+        }
+
+        var kill = document.createElement("button");
+        kill.type = "button";
+        kill.className = "kill noprint";
+        kill.textContent = "×";
+        kill.title = "Remove this item";
+        kill.setAttribute("aria-label", "Remove " + it.text);
+        kill.addEventListener("click", function () {
+          if (it.custom) {
+            state.custom[group.id] = (state.custom[group.id] || []).filter(function (e) { return e.id !== it.id; });
+          } else {
+            state.removed[group.id] = (state.removed[group.id] || []).concat(it.id);
+          }
+          delete state.checked[it.id];
+          save();
+          render();
+          refreshTotals();
+        });
+
+        li.appendChild(chk);
+        li.appendChild(label);
+        li.appendChild(kill);
+        list.appendChild(li);
+      });
+
+      box.appendChild(list);
+
+      var form = document.createElement("form");
+      form.className = "adder noprint";
+      var input = document.createElement("input");
+      input.type = "text";
+      input.placeholder = "Add something…";
+      input.setAttribute("aria-label", "Add an item to " + group.name);
+      input.dataset.group = group.id;
+      var add = document.createElement("button");
+      add.type = "submit";
+      add.className = "btn";
+      add.textContent = "Add";
+      form.appendChild(input);
+      form.appendChild(add);
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        var text = input.value.trim();
+        if (!text) return;
+        state.custom[group.id] = (state.custom[group.id] || []).concat({
+          id: group.id + ".x" + Date.now().toString(36),
+          text: text
+        });
+        save();
+        render();
+        refreshTotals();
+        var again = groupsEl.querySelector('.adder input[data-group="' + group.id + '"]');
+        if (again) again.focus();
+      });
+      box.appendChild(form);
+
+      groupsEl.appendChild(box);
+    });
+  }
+
+  var fillEl = id("fill");
+  var progressEl = id("progress");
+
+  function refreshTotals() {
+    var total = 0, done = 0;
+    DEFAULTS.forEach(function (group) {
+      itemsFor(group).forEach(function (it) {
+        total++;
+        if (state.checked[it.id]) done++;
+      });
+    });
+    var pct = total ? Math.round((done / total) * 100) : 0;
+    fillEl.style.width = pct + "%";
+    progressEl.textContent = (done === total && total)
+      ? "All " + total + " packed"
+      : done + " of " + total + " packed · " + (total - done) + " to go";
+  }
+
+  id("filter").addEventListener("click", function () {
+    hidePacked = !hidePacked;
+    this.setAttribute("aria-pressed", String(hidePacked));
+    this.textContent = hidePacked ? "Show everything" : "Hide what's packed";
+    render();
+  });
+
+  id("reset").addEventListener("click", function () {
+    state.checked = {};
+    save();
+    render();
+    refreshTotals();
+  });
+
+  id("signout").addEventListener("click", function () {
+    try { window.sessionStorage.removeItem("camp.signedin"); } catch (e) { /* nothing to do */ }
+    document.documentElement.className += " locked";
+    gate.hidden = false;
+    passField.value = "";
+    gateErr.hidden = true;
+    window.scrollTo(0, 0);
+    userField.focus();
+  });
+
+  /* ── Editable text ───────────────────────────────── */
+  Array.prototype.forEach.call(document.querySelectorAll(".ed"), function (field) {
+    var key = field.getAttribute("data-key");
+    field.setAttribute("contenteditable", "plaintext-only");
+    field.setAttribute("role", "textbox");
+    field.setAttribute("spellcheck", "false");
+    field.setAttribute("tabindex", "0");
+    if (typeof state.fields[key] === "string") field.textContent = state.fields[key];
+    flagEmpty(field);
+    field.addEventListener("input", function () {
+      state.fields[key] = field.textContent.trim();
+      flagEmpty(field);
+      save();
+    });
+    field.addEventListener("keydown", function (e) {
+      if (e.key === "Enter") { e.preventDefault(); field.blur(); }
+    });
+  });
+  function flagEmpty(field) {
+    field.classList.toggle("empty", field.textContent.trim() === "");
+  }
+
+  render();
+  refreshTotals();
+})();
+</script>
+</body>
+</html>
