@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Checkout — TapFirst by Afiye</title>
+<meta name="description" content="Complete your TapFirst order. Delivery details only — no medical information is collected here."/>
+<meta name="theme-color" content="#0B1B33"/>
+<meta name="robots" content="noindex"/>
+<link rel="icon" href="assets/afiyeLogo.png"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Hanken+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+/* ── RESET ───────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:var(--sans);
+  background:var(--cream);
+  color:var(--text);
+  -webkit-font-smoothing:antialiased;
+}
+a{text-decoration:none;color:inherit}
+button{cursor:pointer;font-family:inherit;border:none;background:none;color:inherit}
+img,svg{display:block;max-width:100%}
+ul{list-style:none}
+[hidden]{display:none !important}
+a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{
+  outline:2px solid var(--accent);outline-offset:2px;border-radius:6px;
+}
+
+/* ── PALETTE (shared with index.html) ─────────── */
+:root{
+  --blue-deep:  #0A2F66;
+  --blue-mid:   #155DA8;
+  --accent:     #2F9BFF;
+  --cream:      #F5F8FC;
+  --cream-dark: #E9F0F9;
+  --border:     #D8E3F1;
+  --text:       #0A2F66;
+  --text-muted: #5B7391;
+  --serif:      'Cormorant Garamond',Georgia,serif;
+  --sans:       'Hanken Grotesk',sans-serif;
+  --pad-x:      clamp(20px,5vw,72px);
+  --ease-out:   cubic-bezier(.16,1,.3,1);
+  --shadow-sm:  0 1px 2px rgba(10,47,102,0.05), 0 3px 8px -2px rgba(10,47,102,0.06);
+  --shadow-md:  0 1px 2px rgba(10,47,102,0.05), 0 6px 14px -6px rgba(10,47,102,0.10), 0 18px 34px -18px rgba(10,47,102,0.16);
+}
+
+/* ── HEADER ──────────────────────────────────── */
+.head{
+  background:#0B1B33;
+  padding:20px var(--pad-x);
+}
+.head-inner{
+  max-width:1080px;margin:0 auto;
+  display:flex;align-items:center;gap:16px;
+}
+.brand{display:flex;align-items:center;gap:9px;margin-right:auto}
+.brand img{width:22px;height:22px}
+.brand span{
+  font-family:var(--serif);font-size:1.4rem;font-weight:600;
+  letter-spacing:-0.01em;color:#F5F8FC;
+}
+.back{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:0.72rem;font-weight:600;
+  letter-spacing:0.09em;text-transform:uppercase;
+  color:rgba(245,248,252,0.62);
+  transition:color .2s ease;
+}
+.back:hover{color:#F5F8FC}
+
+/* ── LAYOUT ──────────────────────────────────── */
+.wrap{
+  max-width:1080px;margin:0 auto;
+  padding:clamp(34px,5vw,58px) var(--pad-x) 80px;
+}
+.page-tag{
+  font-size:0.7rem;font-weight:600;
+  letter-spacing:0.14em;text-transform:uppercase;
+  color:var(--accent);margin-bottom:14px;
+}
+.page-title{
+  font-family:var(--serif);
+  font-size:clamp(2rem,4vw,3rem);
+  font-weight:500;line-height:1.08;letter-spacing:-0.02em;
+  color:var(--blue-deep);
+}
+.page-sub{
+  margin-top:14px;max-width:520px;
+  font-size:0.95rem;line-height:1.7;color:var(--text-muted);
+}
+.cols{
+  display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);
+  gap:clamp(24px,4vw,54px);
+  align-items:start;
+  margin-top:clamp(30px,4vw,46px);
+}
+
+/* ── FORM ────────────────────────────────────── */
+.card{
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:clamp(22px,3vw,34px);
+  box-shadow:var(--shadow-sm);
+}
+.card + .card{margin-top:20px}
+.card h2{
+  font-family:var(--serif);
+  font-size:1.5rem;font-weight:600;letter-spacing:-0.01em;
+  color:var(--blue-deep);margin-bottom:4px;
+}
+.card .hint{font-size:0.84rem;color:var(--text-muted);margin-bottom:22px;line-height:1.6}
+
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.field{display:flex;flex-direction:column;gap:7px}
+.field.wide{grid-column:1 / -1}
+.field label{
+  font-size:0.78rem;font-weight:600;letter-spacing:0.02em;
+  color:var(--blue-deep);
+}
+.field label .opt{color:var(--text-muted);font-weight:400}
+.field input,.field textarea,.field select{
+  width:100%;
+  padding:12px 14px;
+  border:1px solid var(--border);
+  border-radius:11px;
+  background:var(--cream);
+  font-family:inherit;font-size:0.92rem;color:var(--text);
+  transition:border-color .18s ease,background .18s ease,box-shadow .18s ease;
+}
+.field textarea{resize:vertical;min-height:88px;line-height:1.6}
+.field input:focus,.field textarea:focus,.field select:focus{
+  outline:none;background:#fff;
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px rgba(47,155,255,0.14);
+}
+.field input::placeholder,.field textarea::placeholder{color:#9FB1C8}
+.field .err{font-size:0.76rem;color:#B3261E;min-height:0}
+.field.invalid input,.field.invalid textarea{border-color:#E5A3A0;background:#FDF6F6}
+
+/* the reassurance panel */
+.private{
+  display:flex;gap:13px;
+  margin-top:22px;padding:15px 17px;
+  background:var(--cream-dark);
+  border:1px solid var(--border);
+  border-radius:13px;
+}
+.private svg{flex-shrink:0;color:var(--accent);margin-top:2px}
+.private p{font-size:0.83rem;line-height:1.65;color:var(--text-muted)}
+.private strong{color:var(--blue-deep);font-weight:600}
+
+/* ── SUMMARY ─────────────────────────────────── */
+.summary{position:sticky;top:24px}
+.line{
+  display:flex;align-items:flex-start;gap:14px;
+  padding-bottom:18px;border-bottom:1px solid var(--border);
+}
+.line .thumb{
+  flex-shrink:0;width:56px;height:56px;border-radius:12px;
+  background:var(--cream-dark);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+}
+.line .thumb img{width:26px;height:26px}
+.line .name{font-size:0.95rem;font-weight:600;color:var(--blue-deep)}
+.line .desc{font-size:0.79rem;color:var(--text-muted);margin-top:2px;line-height:1.5}
+.line .cost{margin-left:auto;font-size:0.95rem;font-weight:600;white-space:nowrap}
+
+.qty{
+  display:flex;align-items:center;
+  border:1px solid var(--border);border-radius:100px;
+  padding:3px;margin-top:11px;width:max-content;
+}
+.qty-btn{
+  width:30px;height:30px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1rem;line-height:1;color:var(--blue-deep);
+  transition:background .16s ease,opacity .16s ease;
+}
+.qty-btn:hover:not(:disabled){background:var(--cream-dark)}
+.qty-btn:disabled{opacity:.32;cursor:not-allowed}
+.qty-input{
+  width:40px;height:30px;border:none;outline:none;background:transparent;
+  font-family:inherit;font-size:0.9rem;font-weight:600;color:var(--blue-deep);
+  text-align:center;appearance:textfield;-moz-appearance:textfield;
+}
+.qty-input::-webkit-outer-spin-button,
+.qty-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+
+.totals{margin-top:18px;display:flex;flex-direction:column;gap:10px}
+.totals .row{display:flex;font-size:0.88rem;color:var(--text-muted)}
+.totals .row span:last-child{margin-left:auto;color:var(--text)}
+.totals .row.grand{
+  margin-top:8px;padding-top:14px;border-top:1px solid var(--border);
+  font-size:1.05rem;color:var(--blue-deep);font-weight:600;
+}
+.totals .row.grand span:last-child{
+  font-family:var(--serif);font-size:1.7rem;font-weight:500;color:var(--blue-deep);
+}
+
+/* terms acceptance, above the order button */
+.terms{
+  display:flex;gap:11px;align-items:flex-start;
+  margin-top:22px;padding:14px 16px;
+  background:var(--cream-dark);
+  border:1px solid var(--border);border-radius:13px;
+  transition:border-color .18s ease,background .18s ease;
+}
+.terms input{
+  margin-top:2px;width:17px;height:17px;flex-shrink:0;
+  accent-color:var(--accent);cursor:pointer;
+}
+.terms label{font-size:0.84rem;line-height:1.6;color:var(--text-muted);cursor:pointer}
+.terms a{color:var(--accent);text-decoration:underline;text-underline-offset:3px}
+.terms.invalid{border-color:#E5A3A0;background:#FDF6F6}
+#termsErr{display:block;margin-top:7px;font-size:0.78rem;color:#B3261E}
+
+.btn-wa{
+  width:100%;margin-top:14px;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  padding:16px 22px;border-radius:100px;
+  background:#25D366;color:#04301A;
+  font-size:0.93rem;font-weight:700;letter-spacing:0.02em;
+  box-shadow:0 1px 2px rgba(4,48,26,0.18), 0 10px 22px -10px rgba(37,211,102,0.65);
+  transition:filter .2s ease,transform .16s ease;
+}
+.btn-wa:hover{filter:brightness(0.95)}
+.btn-wa:active{transform:translateY(1px)}
+.btn-wa svg{flex-shrink:0}
+.wa-note{
+  margin-top:12px;font-size:0.76rem;line-height:1.6;
+  color:var(--text-muted);text-align:center;
+}
+
+/* ── EMPTY + SENT STATES ─────────────────────── */
+.empty{
+  text-align:center;padding:clamp(40px,7vw,80px) 20px;
+  background:#fff;border:1px solid var(--border);border-radius:20px;
+  box-shadow:var(--shadow-sm);
+}
+.empty svg{margin:0 auto 18px;color:var(--border)}
+.empty h2{
+  font-family:var(--serif);font-size:1.7rem;font-weight:500;
+  color:var(--blue-deep);margin-bottom:10px;
+}
+.empty p{font-size:0.92rem;color:var(--text-muted);margin-bottom:24px}
+.btn-primary{
+  display:inline-block;
+  background:var(--accent);color:#062043;
+  border-radius:100px;padding:14px 30px;
+  font-size:0.85rem;font-weight:700;letter-spacing:0.04em;
+  box-shadow:0 1px 2px rgba(4,20,45,0.18), 0 8px 18px -8px rgba(47,155,255,0.5);
+  transition:filter .2s ease;
+}
+.btn-primary:hover{filter:brightness(0.94)}
+
+.sent{
+  margin-top:18px;padding:16px 18px;
+  background:#EEF9F2;border:1px solid #BFE6CE;border-radius:13px;
+  font-size:0.86rem;line-height:1.65;color:#155C33;
+}
+.sent strong{font-weight:600}
+.sent a{color:#0F7A3D;text-decoration:underline;text-underline-offset:3px}
+
+/* ── FOOTER ──────────────────────────────────── */
+.foot{
+  border-top:1px solid var(--border);
+  padding:26px var(--pad-x);
+  text-align:center;
+  font-size:0.75rem;line-height:1.7;color:var(--text-muted);
+}
+
+@media(max-width:900px){
+  .cols{grid-template-columns:1fr}
+  .summary{position:static;order:-1}
+}
+@media(max-width:560px){
+  .grid{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion: reduce){
+  *{animation:none !important;transition:none !important}
+}
+</style>
+</head>
+<body>
+
+<header class="head">
+  <div class="head-inner">
+    <a href="index.html" class="brand">
+      <img src="assets/afiyeLogo.png" alt="" width="22" height="22">
+      <span>Afiye</span>
+    </a>
+    <a href="index.html" class="back">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="M11 18l-6-6 6-6"/></svg>
+      Continue shopping
+    </a>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- EMPTY CART -->
+  <div class="empty" id="emptyState" hidden>
+    <svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 7h14l-1.2 11.2A2 2 0 0 1 15.8 20H8.2a2 2 0 0 1-2-1.8L5 7Z"/><path d="M9 7V5.5a3 3 0 0 1 6 0V7"/></svg>
+    <h2>Your cart is empty</h2>
+    <p>Add a TapFirst tag and it will show up here.</p>
+    <a class="btn-primary" href="index.html#product">Browse TapFirst</a>
+  </div>
+
+  <!-- CHECKOUT -->
+  <div id="checkoutState" hidden>
+    <p class="page-tag">Checkout</p>
+    <h1 class="page-title">Where should we<br>send your tag?</h1>
+    <p class="page-sub">Delivery details only. We confirm every order personally on WhatsApp before it ships.</p>
+
+    <div class="cols">
+
+      <!-- LEFT: details -->
+      <form id="orderForm" novalidate>
+        <div class="card">
+          <h2>Your details</h2>
+          <p class="hint">So we know who the order belongs to and how to reach you.</p>
+
+          <div class="grid">
+            <div class="field wide">
+              <label for="name">Full name</label>
+              <input id="name" name="name" type="text" autocomplete="name" placeholder="John Doe" required>
+              <span class="err" data-for="name"></span>
+            </div>
+            <div class="field">
+              <label for="email">Email</label>
+              <input id="email" name="email" type="email" autocomplete="email" placeholder="you@example.com" required>
+              <span class="err" data-for="email"></span>
+            </div>
+            <div class="field">
+              <label for="phone">Phone</label>
+              <input id="phone" name="phone" type="tel" autocomplete="tel" placeholder="+961 71 000 000" required>
+              <span class="err" data-for="phone"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Delivery address</h2>
+          <p class="hint">Where the tag should arrive. Orders average five days from order to delivery.</p>
+
+          <div class="grid">
+            <div class="field wide">
+              <label for="street">Street address</label>
+              <input id="street" name="street" type="text" autocomplete="address-line1" placeholder="12 Rue Gouraud" required>
+              <span class="err" data-for="street"></span>
+            </div>
+            <div class="field wide">
+              <label for="street2">Apartment, floor, building <span class="opt">— optional</span></label>
+              <input id="street2" name="street2" type="text" autocomplete="address-line2" placeholder="Apt 4, 3rd floor">
+            </div>
+            <div class="field">
+              <label for="city">City</label>
+              <input id="city" name="city" type="text" autocomplete="address-level2" placeholder="Beirut" required>
+              <span class="err" data-for="city"></span>
+            </div>
+            <div class="field">
+              <label for="postcode">Postal code <span class="opt">— optional</span></label>
+              <input id="postcode" name="postcode" type="text" autocomplete="postal-code" placeholder="1103">
+            </div>
+            <div class="field wide">
+              <label for="country">Country</label>
+              <input id="country" name="country" type="text" autocomplete="country-name" placeholder="Lebanon" required>
+              <span class="err" data-for="country"></span>
+            </div>
+            <div class="field wide">
+              <label for="notes">Delivery notes <span class="opt">— optional</span></label>
+              <textarea id="notes" name="notes" placeholder="Leave with the concierge, call on arrival…"></textarea>
+            </div>
+          </div>
+
+          <div class="private">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+            <p><strong>No medical information here.</strong> Nothing on this page asks about your health, and none is sent with your order. Your emergency profile — blood type, medications, allergies, conditions, contacts — is set up separately on an encrypted page once your tag arrives.</p>
+          </div>
+        </div>
+      </form>
+
+      <!-- RIGHT: summary -->
+      <aside class="summary">
+        <div class="card">
+          <h2>Order summary</h2>
+          <p class="hint">One tag covers one person's profile.</p>
+
+          <div class="line">
+            <div class="thumb"><img src="assets/afiyeLogo.png" alt="" width="26" height="26"></div>
+            <div>
+              <div class="name">TapFirst</div>
+              <div class="desc">Emergency medical NFC tag<br>Lifetime chip · 2-year warranty</div>
+              <div class="qty" role="group" aria-label="Quantity">
+                <button class="qty-btn" type="button" data-step="-1" aria-label="Decrease quantity">&minus;</button>
+                <input class="qty-input" id="qty" type="number" value="1" min="1" max="99" step="1" inputmode="numeric" aria-label="Quantity">
+                <button class="qty-btn" type="button" data-step="1" aria-label="Increase quantity">+</button>
+              </div>
+            </div>
+            <div class="cost" id="lineCost">$4.99</div>
+          </div>
+
+          <div class="totals">
+            <div class="row"><span>Subtotal</span><span id="subtotal">$4.99</span></div>
+            <div class="row grand"><span>Total</span><span id="grandTotal">$4.99</span></div>
+          </div>
+
+          <div class="terms" id="termsBox">
+            <input id="terms" type="checkbox">
+            <label for="terms">I have read and agree to the
+              <a href="terms.html" target="_blank" rel="noopener">terms &amp; conditions</a>.</label>
+          </div>
+          <span class="err" id="termsErr" role="alert"></span>
+
+          <button class="btn-wa" id="placeOrder" type="button">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.46 1.32 4.96L2 22l5.25-1.38c1.45.79 3.08 1.21 4.79 1.21h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2Zm0 18.15h-.01c-1.52 0-3.01-.41-4.31-1.18l-.31-.18-3.2.84.85-3.12-.2-.32a8.2 8.2 0 0 1-1.26-4.38c0-4.54 3.7-8.23 8.24-8.23 2.2 0 4.27.86 5.82 2.42a8.18 8.18 0 0 1 2.41 5.82c0 4.54-3.69 8.23-8.23 8.23Zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.13-.16.24-.64.8-.79.97-.14.16-.29.18-.54.06-.25-.12-1.05-.39-1.99-1.23-.74-.66-1.23-1.47-1.38-1.72-.14-.25-.01-.38.11-.5.11-.11.25-.29.37-.43.13-.15.17-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.4-.42-.56-.43h-.47c-.17 0-.43.06-.66.31-.23.25-.86.85-.86 2.07 0 1.22.89 2.4 1.01 2.56.12.17 1.75 2.67 4.23 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.56.1.48-.07 1.47-.6 1.68-1.18.21-.58.21-1.08.14-1.18-.06-.11-.22-.17-.47-.29Z"/></svg>
+            Place order on WhatsApp
+          </button>
+          <p class="wa-note">This opens WhatsApp with your order ready to send. Nothing is charged here — we confirm the details and payment with you directly.</p>
+
+          <div class="sent" id="sentNote" hidden>
+            <strong>Order opened in WhatsApp.</strong> Send the message to complete it. If nothing opened,
+            <a href="#" id="waFallback" target="_blank" rel="noopener">use this link</a>.
+          </div>
+        </div>
+      </aside>
+
+    </div>
+  </div>
+</main>
+
+<footer class="foot">
+  &copy; 2026 Afiye, Inc. &middot; <a href="terms.html" style="color:inherit;text-decoration:underline;text-underline-offset:3px">Terms &amp; conditions</a><br>
+  TapFirst is not a substitute for required medical identification or emergency services.<br>
+  Always contact your local emergency number first.
+</footer>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ══════════════════════════════════════════════════════════════
+     ORDER SETTINGS
+
+     WHATSAPP — the number the order is sent to, in full international
+     format, digits only: country code first, no +, no spaces, and no
+     leading zero on the local part.
+
+     Right now it is the number you gave, exactly as given. If tapping
+     the button shows "Phone number shared via url is invalid", the
+     country code is what's missing — for a Lebanese 71 number that
+     would make it '96171065746'.
+  ══════════════════════════════════════════════════════════════ */
+  var WHATSAPP = '71065746';
+  var CURRENCY = '$';
+
+  /* Goes out on every order message so you can tell an order that came
+     through the site from one that didn't. It is never shown on the
+     page — though note anyone who opens the page source can still read
+     it, so treat it as a label, not a secret. */
+  var ORDER_CODE = '#T0531';
+
+  /* The price travels with the cart from the product page, so it is
+     only ever edited in one place — index.html. This is the fallback
+     for a cart saved before that, or a hand-typed URL. */
+  var PRICE = 4.99;
+
+  var CART_KEY = 'afiye.cart';
+
+  function readCart() {
+    try {
+      var raw = localStorage.getItem(CART_KEY);
+      if (!raw) return 0;
+      var data = JSON.parse(raw);
+      var p = parseFloat(data.price);
+      if (!isNaN(p) && p > 0) PRICE = p;
+      var n = parseInt(data.qty, 10);
+      return n > 0 ? Math.min(n, 99) : 0;
+    } catch (e) { return 0; }
+  }
+  function writeCart(qty) {
+    try {
+      localStorage.setItem(CART_KEY, JSON.stringify({ qty: qty, price: PRICE }));
+    } catch (e) {}
+  }
+  function money(n) {
+    return CURRENCY + n.toFixed(2);
+  }
+
+  var qty = readCart();
+
+  var emptyState    = document.getElementById('emptyState');
+  var checkoutState = document.getElementById('checkoutState');
+
+  if (qty <= 0) {
+    emptyState.hidden = false;
+    return;
+  }
+  checkoutState.hidden = false;
+
+  /* ── QUANTITY ───────────────────────────────────────────────── */
+  var qtyInput = document.getElementById('qty');
+  qtyInput.value = qty;
+
+  function paint() {
+    document.getElementById('lineCost').textContent  = money(PRICE * qty);
+    document.getElementById('subtotal').textContent  = money(PRICE * qty);
+    document.getElementById('grandTotal').textContent = money(PRICE * qty);
+    document.querySelector('.qty-btn[data-step="-1"]').disabled = qty <= 1;
+    document.querySelector('.qty-btn[data-step="1"]').disabled  = qty >= 99;
+  }
+
+  function setQty(n) {
+    if (isNaN(n) || n < 1) n = 1;
+    if (n > 99) n = 99;
+    qty = n;
+    qtyInput.value = n;
+    writeCart(n);
+    paint();
+  }
+  setQty(qty);
+
+  document.querySelectorAll('.qty-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      setQty(qty + parseInt(btn.getAttribute('data-step'), 10));
+    });
+  });
+  qtyInput.addEventListener('change', function () { setQty(parseInt(qtyInput.value, 10)); });
+  qtyInput.addEventListener('blur',   function () { setQty(parseInt(qtyInput.value, 10)); });
+
+  /* ── VALIDATION ─────────────────────────────────────────────── */
+  var form = document.getElementById('orderForm');
+
+  function val(id) {
+    return (document.getElementById(id).value || '').trim();
+  }
+  function showError(id, message) {
+    var input = document.getElementById(id);
+    var slot  = document.querySelector('.err[data-for="' + id + '"]');
+    input.closest('.field').classList.toggle('invalid', !!message);
+    if (slot) slot.textContent = message || '';
+  }
+
+  function checkField(id) {
+    var value = val(id);
+    if (!value) { showError(id, 'Required'); return false; }
+    if (id === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value)) {
+      showError(id, 'That email does not look right'); return false;
+    }
+    if (id === 'phone' && value.replace(/\D/g, '').length < 6) {
+      showError(id, 'That phone number looks too short'); return false;
+    }
+    showError(id, '');
+    return true;
+  }
+
+  var REQUIRED = ['name', 'email', 'phone', 'street', 'city', 'country'];
+
+  REQUIRED.forEach(function (id) {
+    var input = document.getElementById(id);
+    /* Only nag once a field has been touched and left. */
+    input.addEventListener('blur', function () { if (val(id)) checkField(id); });
+    input.addEventListener('input', function () {
+      if (input.closest('.field').classList.contains('invalid')) checkField(id);
+    });
+  });
+
+  /* ── PLACE ORDER ────────────────────────────────────────────── */
+  function buildMessage() {
+    var lines = [];
+    lines.push('*New TapFirst order*');
+    lines.push('Code: ' + ORDER_CODE);
+    lines.push('');
+    lines.push('Product: TapFirst — emergency medical NFC tag');
+    lines.push('Quantity: ' + qty);
+    lines.push('Total: ' + money(PRICE * qty));
+    lines.push('');
+    lines.push('*Customer*');
+    lines.push('Name: ' + val('name'));
+    lines.push('Email: ' + val('email'));
+    lines.push('Phone: ' + val('phone'));
+    lines.push('');
+    lines.push('*Deliver to*');
+    lines.push(val('street'));
+    if (val('street2')) lines.push(val('street2'));
+    lines.push(val('city') + (val('postcode') ? ' ' + val('postcode') : ''));
+    lines.push(val('country'));
+    if (val('notes')) {
+      lines.push('');
+      lines.push('Notes: ' + val('notes'));
+    }
+    return lines.join('\n');
+  }
+
+  var termsBox = document.getElementById('termsBox');
+  var terms    = document.getElementById('terms');
+  var termsErr = document.getElementById('termsErr');
+
+  terms.addEventListener('change', function () {
+    if (terms.checked) {
+      termsBox.classList.remove('invalid');
+      termsErr.textContent = '';
+    }
+  });
+
+  document.getElementById('placeOrder').addEventListener('click', function () {
+    var ok = true;
+    REQUIRED.forEach(function (id) { if (!checkField(id)) ok = false; });
+
+    /* The terms must be accepted before an order can be sent. */
+    var termsOk = terms.checked;
+    termsBox.classList.toggle('invalid', !termsOk);
+    termsErr.textContent = termsOk ? '' : 'Please read and accept the terms to continue.';
+    if (!termsOk) ok = false;
+
+    if (!ok) {
+      var first = form.querySelector('.field.invalid input') || (termsOk ? null : terms);
+      if (first) { first.focus(); first.scrollIntoView({ block: 'center', behavior: 'smooth' }); }
+      return;
+    }
+
+    var url = 'https://wa.me/' + WHATSAPP + '?text=' + encodeURIComponent(buildMessage());
+    var note = document.getElementById('sentNote');
+    document.getElementById('waFallback').href = url;
+    note.hidden = false;
+    window.open(url, '_blank', 'noopener');
+  });
+})();
+</script>
+</body>
+</html>
